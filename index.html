@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy Hug Day 🫂</title>
+  <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Nunito:wght@400;600;700;800;900&family=Lilita+One&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --amber:   #ff8c42;
+      --coral:   #ff5e6c;
+      --peach:   #ffcba4;
+      --cream:   #fff8f0;
+      --deep:    #2d1b0e;
+      --mid:     #7a3b1e;
+      --soft:    #ffe4cc;
+      --white:   #ffffff;
+      --shadow:  rgba(45,27,14,.18);
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--cream);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── big warm gradient hero bg ── */
+    .hero-bg {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse at 0% 0%,   rgba(255,140,66,.35)  0%, transparent 55%),
+        radial-gradient(ellipse at 100% 100%, rgba(255,94,108,.3)  0%, transparent 55%),
+        radial-gradient(ellipse at 50%  50%,  rgba(255,203,164,.2) 0%, transparent 70%),
+        var(--cream);
+    }
+
+    /* ── floating emojis bg ── */
+    .floaty { position:fixed; pointer-events:none; z-index:0; font-size:2rem; opacity:0; animation: floatUp linear infinite; }
+    @keyframes floatUp {
+      0%   { transform: translateY(110vh) rotate(0deg);   opacity:0; }
+      5%   { opacity:.25; }
+      95%  { opacity:.2; }
+      100% { transform: translateY(-10vh) rotate(360deg); opacity:0; }
+    }
+
+    /* ── page ── */
+    .page {
+      position: relative; z-index:1;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+      display: flex; flex-direction: column; align-items: center; gap: 0;
+    }
+
+    /* ── header ── */
+    .header { text-align:center; margin-bottom: 36px; animation: popIn .7s ease both; }
+
+    @keyframes popIn {
+      0%   { opacity:0; transform: scale(.7); }
+      70%  { transform: scale(1.04); }
+      100% { opacity:1; transform: scale(1); }
+    }
+
+    .tag {
+      display: inline-block;
+      background: var(--coral);
+      color: white;
+      font-size: .8rem; font-weight:800; letter-spacing:3px;
+      text-transform: uppercase;
+      padding: 5px 16px; border-radius:50px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      font-family: 'Lilita One', cursive;
+      font-size: clamp(3.2rem, 10vw, 5.5rem);
+      color: var(--deep);
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .header-sub {
+      font-size: 1.15rem; color: var(--mid);
+      font-weight: 600; margin-bottom:6px;
+    }
+
+    .date-badge {
+      display:inline-block;
+      border: 2.5px solid var(--amber);
+      color: var(--amber);
+      font-weight:800; font-size:.9rem; letter-spacing:2px;
+      padding: 4px 16px; border-radius:50px;
+      margin-top:8px;
+    }
+
+    /* ══════════════════════
+       STEP TRACKER
+    ══════════════════════ */
+    .steps {
+      display:flex; gap:10px; align-items:center;
+      margin-bottom: 36px;
+      animation: popIn .7s .2s ease both;
+    }
+    .step-dot {
+      width:12px; height:12px; border-radius:50%;
+      background: var(--peach);
+      transition: all .4s;
+    }
+    .step-dot.active   { background: var(--coral); transform:scale(1.4); }
+    .step-dot.done     { background: var(--amber); }
+    .step-line {
+      width:40px; height:3px; border-radius:2px;
+      background: var(--peach); transition: background .4s;
+    }
+    .step-line.done { background: var(--amber); }
+
+    /* ══════════════════════
+       SCREENS (shared card)
+    ══════════════════════ */
+    .screen {
+      width:100%;
+      background: var(--white);
+      border-radius: 28px;
+      padding: 44px 36px;
+      box-shadow: 0 12px 48px var(--shadow);
+      display: none;
+      animation: slideIn .5s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    .screen.active { display:block; }
+
+    @keyframes slideIn {
+      from { opacity:0; transform: translateY(40px) scale(.96); }
+      to   { opacity:1; transform: translateY(0)    scale(1); }
+    }
+
+    .screen-title {
+      font-family: 'Righteous', cursive;
+      font-size: 1.6rem; color: var(--deep);
+      margin-bottom: 8px;
+    }
+    .screen-sub {
+      font-size:1rem; color: var(--mid);
+      margin-bottom: 28px; line-height:1.6;
+    }
+
+    /* ══════════════════════
+       SCREEN 1 — BUILD A HUG
+    ══════════════════════ */
+    .hug-types {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .hug-type {
+      border: 3px solid var(--peach);
+      border-radius: 20px;
+      padding: 22px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .25s ease;
+      position: relative;
+      overflow: hidden;
+      background: var(--cream);
+      user-select: none;
+    }
+    .hug-type::before {
+      content:'';
+      position:absolute; inset:0;
+      background: linear-gradient(135deg, var(--amber), var(--coral));
+      opacity:0; transition: opacity .25s;
+    }
+    .hug-type:hover { border-color: var(--amber); transform: translateY(-4px); box-shadow: 0 8px 24px rgba(255,140,66,.2); }
+    .hug-type.selected { border-color: var(--coral); transform: translateY(-4px) scale(1.03); box-shadow: 0 8px 28px rgba(255,94,108,.3); }
+    .hug-type.selected::before { opacity:1; }
+
+    .hug-type-inner { position:relative; z-index:1; }
+    .hug-type.selected .hug-type-inner { color:white; }
+
+    .hug-icon   { font-size:3rem; margin-bottom:10px; display:block; }
+    .hug-name   { font-family:'Righteous', cursive; font-size:1.1rem; margin-bottom:6px; color:var(--deep); }
+    .hug-type.selected .hug-name { color:white; }
+    .hug-desc   { font-size:.85rem; color:var(--mid); line-height:1.5; }
+    .hug-type.selected .hug-desc { color:rgba(255,255,255,.85); }
+
+    /* intensity slider */
+    .intensity-section { margin-top:28px; }
+    .intensity-label {
+      font-weight:800; color:var(--deep);
+      font-size:1rem; margin-bottom:12px;
+      display:flex; justify-content:space-between;
+    }
+    .intensity-label span { color:var(--coral); font-family:'Righteous',cursive; font-size:1.2rem; }
+
+    input[type=range] {
+      width:100%; -webkit-appearance:none; appearance:none;
+      height:10px; border-radius:5px;
+      background: linear-gradient(to right, var(--amber) 0%, var(--coral) 100%);
+      outline:none; cursor:pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance:none; appearance:none;
+      width:28px; height:28px; border-radius:50%;
+      background: white; border:3px solid var(--coral);
+      cursor:pointer; box-shadow:0 3px 10px rgba(255,94,108,.4);
+      transition: transform .2s;
+    }
+    input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
+
+    .intensity-desc {
+      margin-top:10px;
+      font-size:.95rem; color:var(--mid);
+      text-align:center; min-height:1.4em;
+      font-weight:600; transition:all .3s;
+    }
+
+    /* next btn */
+    .next-btn {
+      margin-top:32px; width:100%;
+      background: linear-gradient(135deg, var(--amber), var(--coral));
+      color:white; border:none; border-radius:50px;
+      font-family:'Righteous', cursive; font-size:1.3rem;
+      padding:16px; cursor:pointer;
+      box-shadow:0 6px 24px rgba(255,94,108,.4);
+      transition:all .25s; letter-spacing:.5px;
+      opacity:.5; pointer-events:none;
+    }
+    .next-btn.ready { opacity:1; pointer-events:all; }
+    .next-btn:hover { transform:translateY(-3px); box-shadow:0 10px 30px rgba(255,94,108,.5); }
+    .next-btn:active { transform:scale(.97); }
+
+    /* ══════════════════════
+       SCREEN 2 — METER
+    ══════════════════════ */
+    .meter-wrap { text-align:center; }
+
+    .big-hug-emoji {
+      font-size: 6rem;
+      display:block; margin:0 auto 20px;
+      animation: hugPulse 1s ease-in-out infinite;
+    }
+    @keyframes hugPulse {
+      0%,100%{ transform:scale(1); }
+      50%    { transform:scale(1.12); }
+    }
+
+    /* tape measure */
+    .tape-outer {
+      position:relative;
+      background: #fff3e0;
+      border:3px solid var(--amber);
+      border-radius:12px;
+      height:64px;
+      overflow:hidden;
+      margin:24px 0 10px;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,.08);
+    }
+    .tape-fill {
+      height:100%;
+      background: linear-gradient(90deg, var(--amber), var(--coral));
+      border-radius:9px;
+      width:0%;
+      transition: width .08s linear;
+      position:relative;
+    }
+    .tape-fill::after {
+      content:'';
+      position:absolute; top:0; right:0; bottom:0; width:40px;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.35));
+    }
+    /* tick marks */
+    .tape-ticks {
+      position:absolute; inset:0;
+      display:flex; align-items:flex-end; pointer-events:none;
+    }
+    .tape-tick {
+      flex:1; border-left:1px solid rgba(0,0,0,.12);
+      height:30%; margin-bottom:4px;
+    }
+    .tape-tick:nth-child(5n) { height:55%; border-color:rgba(0,0,0,.2); }
+
+    .tape-label {
+      font-family:'Righteous',cursive;
+      font-size:1.05rem; color:var(--mid);
+      margin-bottom:20px;
+    }
+    .tape-label span { color:var(--coral); font-size:1.3rem; }
+
+    /* meter stats row */
+    .meter-stats {
+      display:grid; grid-template-columns:repeat(3,1fr); gap:14px;
+      margin:24px 0;
+    }
+    .stat-card {
+      background:var(--cream); border-radius:16px; padding:16px 10px; text-align:center;
+      border:2px solid var(--peach);
+    }
+    .stat-icon  { font-size:1.8rem; margin-bottom:6px; display:block; }
+    .stat-val   {
+      font-family:'Righteous',cursive; font-size:1.4rem; color:var(--deep);
+      margin-bottom:4px;
+      min-height:1.8rem;
+    }
+    .stat-name  { font-size:.78rem; color:var(--mid); font-weight:700; text-transform:uppercase; letter-spacing:1px; }
+
+    .charge-btn {
+      width:100%;
+      background: linear-gradient(135deg, var(--amber), var(--coral));
+      color:white; border:none; border-radius:50px;
+      font-family:'Righteous',cursive; font-size:1.4rem;
+      padding:18px; cursor:pointer;
+      box-shadow:0 6px 24px rgba(255,94,108,.4);
+      transition:all .2s; margin-top:10px;
+      user-select:none;
+    }
+    .charge-btn:hover    { transform:scale(1.03); }
+    .charge-btn:active   { transform:scale(.96); }
+    .charge-btn.charging {
+      animation:chargePulse .4s ease-in-out infinite alternate;
+    }
+    @keyframes chargePulse {
+      from { box-shadow: 0 6px 24px rgba(255,94,108,.4); }
+      to   { box-shadow: 0 6px 40px rgba(255,94,108,.8); transform:scale(1.02); }
+    }
+
+    /* ══════════════════════
+       SCREEN 3 — RESULT
+    ══════════════════════ */
+    .result-wrap { text-align:center; }
+
+    .result-burst {
+      font-size:6rem; display:block;
+      margin:0 auto 16px;
+      animation:burst .6s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes burst {
+      0%  { transform:scale(0) rotate(-20deg); opacity:0; }
+      100%{ transform:scale(1) rotate(0deg);   opacity:1; }
+    }
+
+    .result-headline {
+      font-family:'Lilita One', cursive;
+      font-size:clamp(2rem,6vw,3rem);
+      color:var(--deep); margin-bottom:8px; line-height:1.2;
+    }
+    .result-sub {
+      font-size:1.05rem; color:var(--mid);
+      margin-bottom:28px; line-height:1.7; font-weight:600;
+    }
+
+    .result-cards {
+      display:grid; grid-template-columns:1fr 1fr; gap:14px;
+      margin-bottom:28px;
+    }
+    .result-card {
+      border-radius:18px; padding:20px 14px; text-align:center;
+      animation: popIn .5s ease both;
+    }
+    .result-card:nth-child(1){ background:#fff3e0; animation-delay:.1s; }
+    .result-card:nth-child(2){ background:#fce4ec; animation-delay:.2s; }
+    .result-card:nth-child(3){ background:#e8f5e9; animation-delay:.3s; }
+    .result-card:nth-child(4){ background:#e3f2fd; animation-delay:.4s; }
+
+    .rc-icon  { font-size:2.2rem; margin-bottom:8px; display:block; }
+    .rc-title { font-family:'Righteous',cursive; font-size:.85rem; color:var(--mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+    .rc-val   { font-family:'Lilita One',cursive; font-size:1.3rem; color:var(--deep); line-height:1.3; }
+
+    .final-note {
+      background:linear-gradient(135deg,var(--amber),var(--coral));
+      color:white; border-radius:20px;
+      padding:24px 20px; margin-bottom:28px;
+      font-size:1.1rem; line-height:1.8; font-weight:600;
+      animation: popIn .6s .5s ease both; opacity:0;
+    }
+    .final-note.show { opacity:1; }
+
+    .again-btn {
+      background:transparent; border:3px solid var(--amber);
+      color:var(--amber); border-radius:50px;
+      font-family:'Righteous',cursive; font-size:1.1rem;
+      padding:12px 36px; cursor:pointer; transition:all .25s;
+    }
+    .again-btn:hover { background:var(--amber); color:white; transform:scale(1.04); }
+
+    @media(max-width:480px){
+      .hug-types        { grid-template-columns:1fr 1fr; }
+      .screen           { padding:30px 20px; }
+      .result-cards     { grid-template-columns:1fr 1fr; }
+      .meter-stats      { grid-template-columns:repeat(3,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="hero-bg"></div>
+
+<div class="page">
+
+  <!-- header -->
+  <div class="header">
+    <div class="tag">Valentine's Week</div>
+    <h1>Hug Day 🫂</h1>
+    <p class="header-sub">Build the perfect hug, charge it up & send it!</p>
+    <div class="date-badge">FEBRUARY 12, 2026</div>
+  </div>
+
+  <!-- step dots -->
+  <div class="steps">
+    <div class="step-dot active" id="dot1"></div>
+    <div class="step-line"      id="line1"></div>
+    <div class="step-dot"       id="dot2"></div>
+    <div class="step-line"      id="line2"></div>
+    <div class="step-dot"       id="dot3"></div>
+  </div>
+
+  <!-- ── SCREEN 1: BUILD ── -->
+  <div class="screen active" id="screen1">
+    <div class="screen-title">Step 1 — Build Your Hug</div>
+    <p class="screen-sub">Pick a hug type and set the intensity 🔥</p>
+
+    <div class="hug-types">
+      <div class="hug-type" onclick="selectHug(this,'Warm Bear Hug','🐻','Long, slow, and deeply comforting')">
+        <div class="hug-type-inner">
+          <span class="hug-icon">🐻</span>
+          <div class="hug-name">Warm Bear Hug</div>
+          <div class="hug-desc">Long, slow, and deeply comforting</div>
+        </div>
+      </div>
+      <div class="hug-type" onclick="selectHug(this,'Tight Squeeze','💪','Hold on and never let go')">
+        <div class="hug-type-inner">
+          <span class="hug-icon">💪</span>
+          <div class="hug-name">Tight Squeeze</div>
+          <div class="hug-desc">Hold on and never let go</div>
+        </div>
+      </div>
+      <div class="hug-type" onclick="selectHug(this,'Surprise Hug','🎉','Sneaky, sudden, and full of joy')">
+        <div class="hug-type-inner">
+          <span class="hug-icon">🎉</span>
+          <div class="hug-name">Surprise Hug</div>
+          <div class="hug-desc">Sneaky, sudden, and full of joy</div>
+        </div>
+      </div>
+      <div class="hug-type" onclick="selectHug(this,'Cozy Snuggle','🛋️','Soft, warm, wrapped in comfort')">
+        <div class="hug-type-inner">
+          <span class="hug-icon">🛋️</span>
+          <div class="hug-name">Cozy Snuggle</div>
+          <div class="hug-desc">Soft, warm, wrapped in comfort</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="intensity-section">
+      <div class="intensity-label">
+        Intensity Level <span id="intensityVal">5</span>
+      </div>
+      <input type="range" min="1" max="10" value="5" id="intensitySlider" oninput="updateIntensity(this.value)"/>
+      <div class="intensity-desc" id="intensityDesc">A solid, heartfelt hug 💛</div>
+    </div>
+
+    <button class="next-btn" id="nextBtn1" onclick="goToMeter()">
+      Charge it up ⚡
+    </button>
+  </div>
+
+  <!-- ── SCREEN 2: METER ── -->
+  <div class="screen" id="screen2">
+    <div class="meter-wrap">
+      <div class="screen-title">Step 2 — Charge the Hug-O-Meter</div>
+      <p class="screen-sub">Hold the button to power up your hug! 🔋</p>
+
+      <span class="big-hug-emoji" id="meterEmoji">🫂</span>
+
+      <div class="tape-outer">
+        <div class="tape-fill" id="tapeFill"></div>
+        <div class="tape-ticks" id="tapeTicks"></div>
+      </div>
+      <div class="tape-label" id="tapeLabel">Length: <span id="hugLength">0 cm</span></div>
+
+      <div class="meter-stats">
+        <div class="stat-card">
+          <span class="stat-icon">🌡️</span>
+          <div class="stat-val" id="warmthVal">0°</div>
+          <div class="stat-name">Warmth</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">💪</span>
+          <div class="stat-val" id="strengthVal">0%</div>
+          <div class="stat-name">Strength</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">💖</span>
+          <div class="stat-val" id="loveVal">0%</div>
+          <div class="stat-name">Love</div>
+        </div>
+      </div>
+
+      <button class="charge-btn" id="chargeBtn"
+        onmousedown="startCharge()" onmouseup="stopCharge()"
+        ontouchstart="startCharge(event)" ontouchend="stopCharge()">
+        Hold to Charge 🫂
+      </button>
+    </div>
+  </div>
+
+  <!-- ── SCREEN 3: RESULT ── -->
+  <div class="screen" id="screen3">
+    <div class="result-wrap">
+      <span class="result-burst" id="resultEmoji">🫂</span>
+      <div class="result-headline" id="resultHeadline">Your hug is ready!</div>
+      <p class="result-sub" id="resultSub">Here's the breakdown of your legendary hug 🔥</p>
+
+      <div class="result-cards">
+        <div class="result-card">
+          <span class="rc-icon">📏</span>
+          <div class="rc-title">Length</div>
+          <div class="rc-val" id="res-length">—</div>
+        </div>
+        <div class="result-card">
+          <span class="rc-icon">🌡️</span>
+          <div class="rc-title">Warmth</div>
+          <div class="rc-val" id="res-warmth">—</div>
+        </div>
+        <div class="result-card">
+          <span class="rc-icon">💪</span>
+          <div class="rc-title">Strength</div>
+          <div class="rc-val" id="res-strength">—</div>
+        </div>
+        <div class="result-card">
+          <span class="rc-icon">💖</span>
+          <div class="rc-title">Love</div>
+          <div class="rc-val" id="res-love">—</div>
+        </div>
+      </div>
+
+      <div class="final-note" id="finalNote"></div>
+
+      <button class="again-btn" onclick="restart()">Build another hug 🫂</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── floating emojis ──
+  const emojis = ['🫂','💕','🤗','💛','✨','🌸','❤️'];
+  for(let i=0;i<16;i++){
+    const el = document.createElement('div');
+    el.className='floaty';
+    el.textContent = emojis[i%emojis.length];
+    el.style.cssText = `
+      left:${Math.random()*100}%;
+      font-size:${1.2+Math.random()*1.2}rem;
+      animation-duration:${10+Math.random()*12}s;
+      animation-delay:${-Math.random()*14}s;
+    `;
+    document.body.appendChild(el);
+  }
+
+  // tape ticks
+  const tt = document.getElementById('tapeTicks');
+  for(let i=0;i<40;i++){
+    const d=document.createElement('div'); d.className='tape-tick'; tt.appendChild(d);
+  }
+
+  // ── state ──
+  let selectedHugType = null;
+  let intensity       = 5;
+  let chargeInterval  = null;
+  let chargePercent   = 0;
+  let isCharging      = false;
+
+  // ── intensity labels ──
+  const intensityLabels = [
+    '', // 0 unused
+    'Just a gentle touch 🌸',
+    'A soft little hug 🌼',
+    'A friendly squeeze 😊',
+    'A warm, caring hug 💛',
+    'A solid, heartfelt hug 💛',
+    'A strong, loving embrace 🧡',
+    'A big bear hug incoming 🐻',
+    'Extra tight, extra special 💪',
+    'World-class championship hug 🏆',
+    'MAXIMUM HUG POWER — LEGENDARY 🔥',
+  ];
+
+  function updateIntensity(val){
+    intensity = parseInt(val);
+    document.getElementById('intensityVal').textContent = val;
+    document.getElementById('intensityDesc').textContent = intensityLabels[val];
+  }
+
+  function selectHug(el, name, icon, desc){
+    document.querySelectorAll('.hug-type').forEach(t=>t.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedHugType = { name, icon, desc };
+    document.getElementById('nextBtn1').classList.add('ready');
+  }
+
+  // ── meter screen ──
+  function goToMeter(){
+    if(!selectedHugType) return;
+    setScreen(2);
+    document.getElementById('meterEmoji').textContent = selectedHugType.icon;
+    chargePercent = 0;
+    updateMeter(0);
+  }
+
+  function startCharge(e){
+    if(e) e.preventDefault();
+    if(isCharging) return;
+    isCharging = true;
+    document.getElementById('chargeBtn').classList.add('charging');
+    document.getElementById('chargeBtn').textContent = 'Charging… 🔥';
+
+    // speed based on intensity
+    const speed = 0.4 + (intensity * 0.35);
+    chargeInterval = setInterval(()=>{
+      chargePercent = Math.min(100, chargePercent + speed);
+      updateMeter(chargePercent);
+      if(chargePercent >= 100){
+        clearInterval(chargeInterval);
+        chargeInterval = null;
+        setTimeout(showResult, 600);
+      }
+    }, 40);
+  }
+
+  function stopCharge(){
+    if(!isCharging) return;
+    isCharging = false;
+    clearInterval(chargeInterval);
+    chargeInterval = null;
+    document.getElementById('chargeBtn').classList.remove('charging');
+    document.getElementById('chargeBtn').textContent = chargePercent >= 100 ? '🎉 Fully Charged!' : 'Hold to Charge 🫂';
+  }
+
+  function updateMeter(pct){
+    document.getElementById('tapeFill').style.width    = pct+'%';
+    // length in cm (max ~300cm)
+    const cm = Math.round(pct * 3);
+    document.getElementById('hugLength').textContent   = cm+' cm';
+    // warmth 0–100
+    const warmth = Math.round(pct * 0.99 + intensity*0.5);
+    document.getElementById('warmthVal').textContent   = Math.min(warmth,100)+'°';
+    // strength
+    document.getElementById('strengthVal').textContent = Math.round(pct)+'%';
+    // love always 100 😄
+    const love = Math.min(100, Math.round(pct * 0.5 + 50));
+    document.getElementById('loveVal').textContent     = love+'%';
+
+    // pulse emoji faster as it fills
+    const dur = Math.max(.3, 1 - pct/130);
+    document.getElementById('meterEmoji').style.animationDuration = dur+'s';
+  }
+
+  // ── result ──
+  const hugNotes = {
+    'Warm Bear Hug': {
+      headline: 'The Ultimate Bear Hug!',
+      note: 'This hug is like being wrapped in the warmest blanket on a cold day. Long, slow, and perfectly safe — this is the kind of hug that makes everything feel okay. Consider yourself completely bear-hugged. 🐻💛',
+      lengthWord: ['a gentle', 'a cozy', 'a long, warm', 'an epic bear'][Math.floor(Math.random()*4)]
+    },
+    'Tight Squeeze': {
+      headline: "No Letting Go!",
+      note: "This is a certified 'I'm not letting you go anywhere' hug. Tight, strong, and loaded with love. You might need a moment to catch your breath after this one. 💪❤️",
+      lengthWord: 'a powerful'
+    },
+    'Surprise Hug': {
+      headline: "Surprise Attack — Hug Edition!",
+      note: "Out of nowhere, BAM — a hug so full of joy and excitement it literally made the universe smile. You've been ambushed with love, and there's nothing you can do about it. 🎉🤗",
+      lengthWord: 'a surprise'
+    },
+    'Cozy Snuggle': {
+      headline: "Maximum Cozy Achieved!",
+      note: "This hug comes with an invisible blanket, a warm drink, and all the comfort in the world. Soft, slow, and impossibly cozy — the kind you never want to end. 🛋️💕",
+      lengthWord: 'an endlessly cozy'
+    }
+  };
+
+  function showResult(){
+    const data   = hugNotes[selectedHugType.name];
+    const cm     = Math.round(chargePercent * 3);
+    const warmth = Math.min(100, Math.round(chargePercent * 0.99 + intensity * 0.5));
+
+    const lengthDesc = cm > 250 ? 'Record-breaking 300 cm!' : cm > 180 ? cm+' cm — Amazing!' : cm > 100 ? cm+' cm — Great!' : cm+' cm — Keep going!';
+    const warmthDesc = warmth > 85 ? 'Scorching hot 🔥' : warmth > 60 ? 'Perfectly warm 🌟' : warmth > 35 ? 'Nicely warm 💛' : 'Getting there 🌤️';
+    const strengthDesc = intensity >= 8 ? 'Legendary 💪🏆' : intensity >= 6 ? 'Super strong 💪' : intensity >= 4 ? 'Just right 😊' : 'Gentle & sweet 🌸';
+    const loveDesc   = '100% — Always ♾️';
+
+    document.getElementById('resultEmoji').textContent   = selectedHugType.icon;
+    document.getElementById('resultHeadline').textContent = data.headline;
+    document.getElementById('resultSub').textContent     = `You built ${data.lengthWord} ${selectedHugType.name.toLowerCase()} at intensity level ${intensity}!`;
+    document.getElementById('res-length').textContent    = lengthDesc;
+    document.getElementById('res-warmth').textContent    = warmthDesc;
+    document.getElementById('res-strength').textContent  = strengthDesc;
+    document.getElementById('res-love').textContent      = loveDesc;
+    document.getElementById('finalNote').textContent     = data.note;
+
+    setScreen(3);
+    setTimeout(()=>{
+      document.getElementById('finalNote').classList.add('show');
+    }, 200);
+
+    burst();
+  }
+
+  // ── confetti-like burst ──
+  function burst(){
+    const b = ['🫂','💕','💛','🤗','✨','🌸','❤️','🎉'];
+    for(let i=0;i<20;i++){
+      const el = document.createElement('div');
+      el.style.cssText=`
+        position:fixed; font-size:${1.5+Math.random()}rem; z-index:999;
+        left:${Math.random()*100}%; top:${Math.random()*100}%;
+        pointer-events:none; animation:burstFly .9s ease forwards;
+        animation-delay:${Math.random()*.4}s;
+      `;
+      el.textContent = b[Math.floor(Math.random()*b.length)];
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(), 1400);
+    }
+  }
+  const s = document.createElement('style');
+  s.textContent=`@keyframes burstFly{
+    0%  {opacity:1;transform:scale(0) translate(0,0);}
+    60% {opacity:1;transform:scale(1.4) translate(${30-Math.random()*60}px,${-40-Math.random()*40}px);}
+    100%{opacity:0;transform:scale(.8) translate(${50-Math.random()*100}px,${-80-Math.random()*60}px);}
+  }`;
+  document.head.appendChild(s);
+
+  // ── screen switcher ──
+  function setScreen(n){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById('screen'+n).classList.add('active');
+    // update dots
+    for(let i=1;i<=3;i++){
+      const d=document.getElementById('dot'+i);
+      if(i<n)       d.className='step-dot done';
+      else if(i===n) d.className='step-dot active';
+      else           d.className='step-dot';
+    }
+    for(let i=1;i<=2;i++){
+      document.getElementById('line'+i).className = i<n ? 'step-line done' : 'step-line';
+    }
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function restart(){
+    chargePercent = 0;
+    selectedHugType = null;
+    intensity = 5;
+    document.getElementById('intensitySlider').value = 5;
+    document.getElementById('intensityVal').textContent = '5';
+    document.getElementById('intensityDesc').textContent = intensityLabels[5];
+    document.querySelectorAll('.hug-type').forEach(t=>t.classList.remove('selected'));
+    document.getElementById('nextBtn1').classList.remove('ready');
+    document.getElementById('finalNote').classList.remove('show');
+    document.getElementById('chargeBtn').textContent = 'Hold to Charge 🫂';
+    updateMeter(0);
+    setScreen(1);
+  }
+</script>
+</body>
+</html>
